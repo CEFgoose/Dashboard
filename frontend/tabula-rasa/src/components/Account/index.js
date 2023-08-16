@@ -20,78 +20,105 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import { isValid, format, parse } from "date-fns";
 // import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
 // import { KeyboardDatePicker } from '@material-ui/pickers';
-import { DatePicker } from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import IsoDatetimeStringToLocalString from "../utils/IsoDatetimeStringToLocalString";
 import { getUser, setUser } from "../utils/auth";
 import { integrations, genders, roles } from "../utils/constants";
-import axios from "network";
 import Sidebar from "../sidebar/sidebar";
 import { DataContext } from "common/DataContext";
 import { AuthContext } from "common/AuthContext";
 
 export const AccountPage = () => {
-  const [state, setState] = useState({
-    // underbarred to match server schema.
-    // editable by self
-    first_name: "",
-    last_name: "",
-    birthday: "",
-    gender: "",
-    phone: "",
-    // editable by admin
-    // role: '',
-    is_active: "",
-    integrations: [],
-    // not editable
-    id: "",
-    email: "",
-    invited_datetime: "",
-    last_active_datetime: "",
-    email_confirmed_datetime: "",
-    // component state
-    isSubmitting: false,
-    menuAnchorEl: null,
-  });
+  // not editable
+  //const [id, setid] = useState("");
+  const [invited_datetime, setInvalid_datetime] = useState("");
+  const [last_active_datetime, setLast_active_datetime] = useState("");
+  const [email_confirmed_datetime, setEmail_confirmed_datetime] = useState("");
+  // component state
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
   let { id } = useParams();
-  let user = getUser();
   id = id === "me" ? user.id : id;
 
-  const navigate = useNavigate();
+  const {
+    history,
+    fetchUserDetails,
+    updateUserDetails,
+    first_name,
+    setFirst_name,
+    last_name,
+    setLast_name,
+    email,
+    setEmail,
+    birthday,
+    setBirthday,
+    gender,
+    setGender,
+    phone,
+    setPhone,
+    role,
+    setRole,
+    is_active,
+    setIs_active,
+    integrations,
+    setIntegrations,
+  } = useContext(DataContext);
+
+  const { refresh, user } = useContext(AuthContext);
 
   useEffect(() => {
-    axios.get(`/api/users/${id}`).then((response) => {
-      setState({
-        ...state,
-        ...response.data.result,
-        birthday: response.data.result.birthday
-          ? format(
-              parse(response.data.result.birthday, "yyyy-MM-dd", new Date()),
-              "MM/dd/yyyy"
-            )
-          : null,
-      });
-    });
-  }, [id]);
+    if (user) {
+      refresh();
+    }
+    if (user === null) {
+      history("/login");
+    }
+    if (user !== null && user.role !== "admin") {
+      history("/login");
+    }
+    fetchUserDetails();
+    // eslint-disable-next-line
+  }, []);
 
-  const handleChange = (event) => {
-    setState({
-      ...state,
-      [event.target.name]: event.target.value,
-    });
+  const handleFirstNameChange = (event) => {
+    setFirst_name(event.target.value);
+  };
+
+  const handleLastNameChange = (event) => {
+    setLast_name(event.target.value);
+  };
+
+  const handleGenderChange = (event) => {
+    setGender(event.target.value);
+  };
+
+  const handlePhoneChange = (event) => {
+    setPhone(event.target.value);
+  };
+
+  const handleRoleChange = (event) => {
+    setRole(event.target.value);
+  };
+
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
+  };
+
+  const handleIs_activeChange = (event) => {
+    setIs_active(event.target.value);
   };
 
   const handleDateChange = (date) => {
     if (isValid(date)) {
-      const stringDate = format(date, "MM/dd/yyyy");
-      setState({ ...state, birthday: stringDate });
+      // const stringDate = format(date, "MM/dd/yyyy");
+      setBirthday(date);
     }
   };
 
   const handleIntegrationChange = (event) => {
-    let newIntegrations = [...state.integrations];
+    let newIntegrations = [integrations];
 
     if (event.target.checked) {
       // add to array of integrations
@@ -103,52 +130,37 @@ export const AccountPage = () => {
       );
     }
     // remove duplicates just in case something fails
-    setState({ ...state, integrations: [...new Set(newIntegrations)] });
+    setIntegrations(newIntegrations);
   };
 
   const submitUpdates = () => {
-    setState({ ...state, isSubmitting: true });
-    // we can safely send the whole state to server because it will ignore extra params or those you don't have permissions to
-    axios
-      .put(`/api/users/${id}`, { ...state })
-      .then((response) => {
-        // update state
-        setState({ ...state, ...response.data.result });
-        // if this was you, also update you
-        if (id === user.id) {
-          setUser({ ...user, ...response.data.result });
-          user = getUser();
-        }
-      })
-      .finally(() => {
-        setState({ ...state, isSubmitting: false });
-      });
+    updateUserDetails();
   };
 
   const handleMenuOpen = (event) => {
-    setState({ ...state, menuAnchorEl: event.currentTarget });
+    setMenuAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
-    setState({ ...state, menuAnchorEl: null });
+    setMenuAnchorEl(null);
   };
 
   const resendInvite = () => {
-    axios.post("/api/auth/reinvite-user", { email: state.email });
+    fetch("/auth/reinvite-user", email);
   };
 
   const deleteUser = () => {
-    // some day this could be prettier? but not often used.
-    // eslint-disable-next-line no-alert
-    const confirmation = window.confirm(
-      "This will permanently remove this user from the system. The data will be unrecoverable. Are you sure?"
-    );
-    if (confirmation) {
-      axios.delete(`/api/users/${id}`).then(() => {
-        // navigate away; this account is gone and not coming back
-        navigate("/app/", { replace: true });
-      });
-    }
+    // // some day this could be prettier? but not often used.
+    // // eslint-disable-next-line no-alert
+    // const confirmation = window.confirm(
+    //   "This will permanently remove this user from the system. The data will be unrecoverable. Are you sure?"
+    // );
+    // if (confirmation) {
+    //   axios.delete(`/api/users/${id}`).then(() => {
+    //     // navigate away; this account is gone and not coming back
+    //     navigate("/app/", { replace: true });
+    //   });
+    // }
   };
 
   const { sidebarOpen, handleSetSidebarState } = useContext(DataContext);
@@ -196,9 +208,9 @@ export const AccountPage = () => {
                           fullWidth
                           label="First Name"
                           name="first_name"
-                          onChange={handleChange}
+                          onChange={handleFirstNameChange}
                           required
-                          value={state.first_name}
+                          value={first_name}
                           variant="outlined"
                         />
                       </Grid>
@@ -207,16 +219,16 @@ export const AccountPage = () => {
                           fullWidth
                           label="Last Name"
                           name="last_name"
-                          onChange={handleChange}
+                          onChange={handleLastNameChange}
                           required
-                          value={state.last_name}
+                          value={last_name}
                           variant="outlined"
                         />
                       </Grid>
                       <Grid item md={6} xs={12}>
-                        <LocalizationProvider dateAdapter = {AdapterDateFns}>
+                        <LocalizationProvider dateAdapter={AdapterDateFns}>
                           <DatePicker
-                            renderInput={(props) => (
+                            textFi={(props) => (
                               <TextField {...props} helperText="invalid mask" />
                             )}
                             disableToolbar
@@ -225,7 +237,7 @@ export const AccountPage = () => {
                             margin="normal"
                             id="date-picker-inline"
                             label="Birthday"
-                            value={state.birthday || null}
+                            value={birthday || null}
                             onChange={handleDateChange}
                             KeyboardButtonProps={{
                               "aria-label": "change date",
@@ -239,14 +251,14 @@ export const AccountPage = () => {
                           fullWidth
                           label="Gender"
                           name="gender"
-                          onChange={handleChange}
+                          onChange={handleGenderChange}
                           select
                           SelectProps={{ native: true }}
-                          value={state.gender}
+                          value={gender || []}
                           variant="outlined"
                         >
                           <option key={null} value={null} aria-label=" " />
-                          {genders.map((option) => (
+                          {genders?.map((option) => (
                             <option key={option} value={option}>
                               {option}
                             </option>
@@ -258,9 +270,9 @@ export const AccountPage = () => {
                           fullWidth
                           label="Phone Number"
                           name="phone"
-                          onChange={handleChange}
+                          onChange={handlePhoneChange}
                           type="text"
-                          value={state.phone}
+                          value={phone}
                           variant="outlined"
                         />
                       </Grid>
@@ -270,115 +282,113 @@ export const AccountPage = () => {
                           label="Email"
                           name="email"
                           type="text"
-                          value={state.email}
+                          value={email}
                           variant="outlined"
                           disabled
                         />
                       </Grid>
-                      {/* {user.role === 'admin' ? ( */}
-                      <>
-                        <Grid item md={6} xs={12}>
-                          <TextField
-                            fullWidth
-                            label="Role"
-                            name="role"
-                            onChange={handleChange}
-                            select
-                            SelectProps={{ native: true }}
-                            value={state.role}
-                            variant="outlined"
-                          >
-                            {/* {roles.map((option) => (
+                      {user.role === "admin" ? (
+                        <>
+                          <Grid item md={6} xs={12}>
+                            <TextField
+                              fullWidth
+                              label="Role"
+                              name="role"
+                              onChange={handleRoleChange}
+                              select
+                              SelectProps={{ native: true }}
+                              value={role || []}
+                              variant="outlined"
+                            >
+                              {roles?.map((option) => (
                                 <option key={option} value={option}>
                                   {option}
                                 </option>
-                              ))} */}
-                          </TextField>
-                        </Grid>
-                        <Grid item md={6} xs={12}>
-                          <TextField
-                            fullWidth
-                            label="Active"
-                            name="is_active"
-                            onChange={handleChange}
-                            select
-                            SelectProps={{ native: true }}
-                            value={state.is_active}
-                            variant="outlined"
-                          >
-                            <option key={null} value={null} aria-label=" " />
-                            <option
-                              key="yes"
-                              // i understand why they want to exclude a bool here, but explicit > implicit. thanks, zen of python!
-                              // eslint-disable-next-line react/jsx-boolean-value
-                              value={true}
+                              ))}
+                            </TextField>
+                          </Grid>
+                          <Grid item md={6} xs={12}>
+                            <TextField
+                              fullWidth
+                              label="Active"
+                              name="is_active"
+                              onChange={handleIs_activeChange}
+                              select
+                              SelectProps={{ native: true }}
+                              value={is_active || []}
+                              variant="outlined"
                             >
-                              yes
-                            </option>
-                            <option key="no" value={false}>
-                              no (disables acccount)
-                            </option>
-                          </TextField>
-                        </Grid>
-                        <Grid item md={12} xs={12}>
-                          <Typography
-                            color="textPrimary"
-                            gutterBottom
-                            variant="h6"
-                          >
-                            Integrations
-                          </Typography>
-                          {integrations.map((integration) => (
-                            <FormControlLabel
-                              key={integration}
-                              control={
-                                <Checkbox
-                                  color="primary"
-                                  name={integration.toLowerCase()}
-                                  checked={state.integrations.includes(
-                                    integration.toLowerCase()
-                                  )}
-                                  onChange={handleIntegrationChange}
-                                />
-                              }
-                              label={integration}
-                            />
-                          ))}
-                        </Grid>
-                        <Grid item md={12} xs={12}>
-                          <Typography
-                            color="textPrimary"
-                            gutterBottom
-                            variant="h6"
-                          >
-                            Invited:{" "}
-                            {IsoDatetimeStringToLocalString(
-                              state.invited_datetime
-                            )}
-                          </Typography>
-                          <Typography
-                            color="textPrimary"
-                            gutterBottom
-                            variant="h6"
-                          >
-                            Joined:{" "}
-                            {IsoDatetimeStringToLocalString(
-                              state.email_confirmed_datetime
-                            )}
-                          </Typography>
-                          <Typography
-                            color="textPrimary"
-                            gutterBottom
-                            variant="h6"
-                          >
-                            Last Active:{" "}
-                            {IsoDatetimeStringToLocalString(
-                              state.last_active_datetime
-                            )}
-                          </Typography>
-                        </Grid>
-                      </>
-                      {/* ) : null} */}
+                              <option key={null} value={null} aria-label=" " />
+                              <option
+                                key="yes"
+                                // i understand why they want to exclude a bool here, but explicit > implicit. thanks, zen of python!
+                                // eslint-disable-next-line react/jsx-boolean-value
+                                value={true}
+                              >
+                                yes
+                              </option>
+                              <option key="no" value={false}>
+                                no (disables acccount)
+                              </option>
+                            </TextField>
+                          </Grid>
+                          <Grid item md={12} xs={12}>
+                            <Typography
+                              color="textPrimary"
+                              gutterBottom
+                              variant="h6"
+                            >
+                              Integrations
+                            </Typography>
+                            {integrations?.map((integration) => (
+                              <FormControlLabel
+                                key={integration}
+                                control={
+                                  <Checkbox
+                                    color="primary"
+                                    name={integration.toLowerCase()}
+                                    checked={integrations.includes(
+                                      integration.toLowerCase()
+                                    )}
+                                    onChange={handleIntegrationChange}
+                                  />
+                                }
+                                label={integration}
+                              />
+                            ))}
+                          </Grid>
+                          <Grid item md={12} xs={12}>
+                            <Typography
+                              color="textPrimary"
+                              gutterBottom
+                              variant="h6"
+                            >
+                              Invited:{" "}
+                              {IsoDatetimeStringToLocalString(invited_datetime)}
+                            </Typography>
+                            <Typography
+                              color="textPrimary"
+                              gutterBottom
+                              variant="h6"
+                            >
+                              Joined:{" "}
+                              {IsoDatetimeStringToLocalString(
+                                email_confirmed_datetime
+                              )}
+                            </Typography>
+                            <Typography
+                              color="textPrimary"
+                              gutterBottom
+                              variant="h6"
+                            >
+                              Last Active:{" "}
+                              {IsoDatetimeStringToLocalString(
+                                last_active_datetime
+                              )}
+                            </Typography>
+                          </Grid>
+                        </>
+                      ) : null}
                     </Grid>
                   </CardContent>
                   <Divider />
@@ -389,50 +399,50 @@ export const AccountPage = () => {
                       p: 2,
                     }}
                   >
-                    {/* {user.role === 'admin' ? ( */}
-                    <>
-                      <Button
-                        aria-controls="customized-menu"
-                        aria-haspopup="true"
-                        onClick={handleMenuOpen}
-                        sx={{
-                          marginRight: "auto",
-                        }}
-                      >
-                        Actions
-                      </Button>
-                      <Menu
-                        id="actions-menu"
-                        anchorEl={state.menuAnchorEl}
-                        keepMounted
-                        open={Boolean(state.menuAnchorEl)}
-                        onClose={handleMenuClose}
-                      >
-                        <MenuItem
-                          onClick={() => {
-                            handleMenuClose();
-                            resendInvite();
-                          }}
-                          disabled={Boolean(state.email_confirmed_datetime)}
-                        >
-                          Resend invitation email
-                        </MenuItem>
-                        <MenuItem
-                          onClick={() => {
-                            handleMenuClose();
-                            deleteUser();
+                    {user.role === "admin" ? (
+                      <>
+                        <Button
+                          aria-controls="customized-menu"
+                          aria-haspopup="true"
+                          onClick={handleMenuOpen}
+                          sx={{
+                            marginRight: "auto",
                           }}
                         >
-                          Permanently delete user
-                        </MenuItem>
-                      </Menu>
-                    </>
-                    {/* ) : null} */}
+                          Actions
+                        </Button>
+                        <Menu
+                          id="actions-menu"
+                          anchorEl={menuAnchorEl}
+                          keepMounted
+                          open={Boolean(menuAnchorEl)}
+                          onClose={handleMenuClose}
+                        >
+                          <MenuItem
+                            onClick={() => {
+                              handleMenuClose();
+                              resendInvite();
+                            }}
+                            disabled={Boolean(email_confirmed_datetime)}
+                          >
+                            Resend invitation email
+                          </MenuItem>
+                          <MenuItem
+                            onClick={() => {
+                              handleMenuClose();
+                              deleteUser();
+                            }}
+                          >
+                            Permanently delete user
+                          </MenuItem>
+                        </Menu>
+                      </>
+                    ) : null}
                     <Button
                       color="primary"
                       variant="contained"
                       padding="5px"
-                      disabled={state.isSubmitting}
+                      disabled={isSubmitting}
                       onClick={submitUpdates}
                     >
                       Save details

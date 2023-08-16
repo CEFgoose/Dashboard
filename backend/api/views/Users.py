@@ -9,6 +9,7 @@ from flask_jwt_extended import (
 )
 from ..static_variables import SSO_BASE_URL
 
+
 class UserAPI(MethodView):
     @jwt_required()
     def post(self, path: str):
@@ -20,6 +21,8 @@ class UserAPI(MethodView):
             return self.unassign_user()
         elif path == "invite_user":
             return self.invite_user()
+        elif path == "fetch_user_details":
+            return self.fetch_user_details()       
         return {
             "message": "Only /project/{fetch_users,fetch_user_projects} is permitted with GET",  # noqa: E501
         }, 405
@@ -129,4 +132,71 @@ class UserAPI(MethodView):
         # update the response dictionary
         response["message"] = "User unassigned"
         response["status"] = 200
+        return response
+    
+    def fetch_user_details(self):
+        # initialize an empty dictionary to store the response
+        response = {}
+        # check if the user information is available in the global context
+        if not g:
+            response["message"] = "User not found"
+            response["status"] = 304
+            return response
+        else:
+            # extract the role, first name, and last name from the user information # noqa: E501
+            id = g.user.id
+            first_name = g.user.first_name.capitalize()
+            last_name = g.user.last_name.capitalize()
+            role = g.user.role
+            email = g.user.email
+            gender = g.user.gender
+            birthday = g.user.birthday
+            phone = g.user.phone
+            is_active = g.user.is_active
+            full_name = f"{first_name} {last_name}"
+            # update the response dictionary with the extracted information
+            response["role"] = role
+            response["first_name"] = first_name
+            response["last_name"] = last_name
+            response["email"] = email
+            response["id"] = id
+            response["gender"] = gender
+            response["birthday"] = birthday
+            response["phone"] = phone
+            response["is_active"] = is_active
+            response["status"] = 200
+            
+            return response
+
+        
+        # UPDATE USER DETAILS FROM ACCOUNT PAGE
+    def update_user_details(self):
+        # initialize an empty dictionary to store the response
+        response = {}
+        # check if the user information is available in the global context
+        if not g:
+            response = {"message": "User not found", "status": 304}
+            return response
+        # Update user details based on provided fields
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "role",
+            "birthday",
+            "gender",
+            "phone",
+            "is_active"
+        ]
+        for field in fields:
+            value = request.json.get(field)
+            if (
+                value is not None
+                and value != ""
+                and value != getattr(g.user, field)
+            ):
+                setattr(g.user, field, value)
+                g.user.update()
+        # Return success response
+        response = {"message": "User details updated", "status": 200}
         return response

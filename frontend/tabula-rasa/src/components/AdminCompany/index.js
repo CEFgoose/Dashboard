@@ -25,42 +25,42 @@ import {
   Typography,
 } from "@mui/material";
 import DropIn from "braintree-web-drop-in-react";
-import { states, integrations } from "../utils/constants";
+import { states, integrations, countries } from "../utils/constants";
 import { CreditCard as CreditCardIcon } from "react-feather";
 import IsoDatetimeStringToLocalString from "../utils/IsoDatetimeStringToLocalString";
 
 let btInstance = null;
 
 export const Company = () => {
-  const [state, setState] = useState({
+  // const [state, setState] = useState({
     // user editable
-    name: "",
-    address: "",
-    address2: "",
-    zip: "",
-    city: "",
-    country: "",
-    phone: "",
-    state: "",
+    const [name, setName] = useState("");
+    const [address, setAddress] = useState("");
+    const [address2, setAddress2] = useState("");
+    const [zip, setZip] = useState("");
+    const [city, setCity] = useState("");
+    const [country, setCountry] = useState("US");
+    const [phone, setPhone ] = useState("");
+    const [state, setState ] = useState("");
     // loaded from the api, but just for reference-- user cannot edit
-    next_bill_date: "",
-    plan: {
+    const [next_bill_date, setNext_bill_date] = useState("");
+    const [plan, setPlan] = useState ({
       // looks something like this, but subject to change...
-      // orca: 700,
-      // base_fee: 5000,
-      // mongoose: 300,
-      // per_user: 500
-    },
-    payment_history: [],
-    joined_date: "",
-    id: "",
-    payment_info: {},
+      orca: 700,
+      base_fee: 5000,
+      mongoose: 300,
+      per_user: 500
+    });
+    const [payment_history, setPayment_history] = useState([]);
+    const [joined_date, setJoined_date] = useState("");
+    const [id, setId] = useState("");
+    const [payment_info, setPayment_info] = useState({});
     // component state
-    isSubmitting: false,
-    initialDataLoaded: false,
-    paymentModalOpen: false,
-    clientToken: null,
-  });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+    const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+    const [clientToken, setClientToken] = useState(null);
+  //});
   const {} = useContext(InteractionContext);
   const {} = useContext(DataContext);
   const { sidebarOpen, handleSetSidebarState } = useContext(DataContext);
@@ -70,10 +70,13 @@ export const Company = () => {
   };
 
   const handleChange = (event) => {
-    setState({
-      ...state,
-      [event.target.name]: event.target.value,
-    });
+    const { name, value } = event.target;
+    setState((prevState) => ({
+      ...prevState,
+      [name]: value,
+      // Automatically set country to "US" if "International" is selected in state
+      country: value === 'international' ? 'international' : prevState.country,
+    }));
   };
 
   return (
@@ -87,9 +90,9 @@ export const Company = () => {
         </div>
       </div>
       <Dialog
-        open={state.paymentModalOpen}
+        open={paymentModalOpen}
         onClose={() =>
-          setState({ ...state, paymentModalOpen: false, clientToken: null })
+          (setPaymentModalOpen(false), setClientToken(null) )
         }
         aria-labelledby="form-dialog-title"
       >
@@ -99,13 +102,13 @@ export const Company = () => {
             Updating this payment method will take effect immediately and all
             future invoices will be charged against the new payment method.
           </DialogContentText>
-          {!state.clientToken ? (
+          {!clientToken ? (
             <div style={{ textAlign: "center" }}>
               <CircularProgress />
             </div>
           ) : (
             <DropIn
-              options={{ authorization: state.clientToken }}
+              options={{ authorization:clientToken }}
               onInstance={(instance) => {
                 btInstance = instance;
               }}
@@ -115,17 +118,18 @@ export const Company = () => {
         <DialogActions>
           <Button
             onClick={() =>
-              setState({ ...state, paymentModalOpen: false, clientToken: null })
+              (setPaymentModalOpen(false), 
+                setClientToken(null) )
             }
             color="primary"
-            disabled={state.isSubmitting}
+            disabled={isSubmitting}
           >
             Cancel
           </Button>
           <Button
             // onClick={updatePaymentInfo}
             color="primary"
-            disabled={state.isSubmitting}
+            disabled={isSubmitting}
           >
             Update
           </Button>
@@ -157,7 +161,7 @@ export const Company = () => {
                   />
                   <Divider />
                   <CardContent>
-                    {/* {state.initialDataLoaded ? ( */}
+                    {initialDataLoaded ? (
                     <Grid container spacing={3}>
                       <Grid item md={6} xs={12}>
                         <TextField
@@ -166,7 +170,7 @@ export const Company = () => {
                           name="name"
                           onChange={handleChange}
                           required
-                          value={state.name || ""}
+                          value={name || ""}
                           variant="outlined"
                         />
                       </Grid>
@@ -176,8 +180,10 @@ export const Company = () => {
                           label="Phone Number"
                           name="phone"
                           onChange={handleChange}
-                          type="number"
-                          value={state.phone || ""}
+                          type="tel"
+                          placeholder="123-456-7890"
+                          pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
+                          value={phone || ""}
                           variant="outlined"
                         />
                       </Grid>
@@ -188,7 +194,7 @@ export const Company = () => {
                           name="address"
                           onChange={handleChange}
                           required
-                          value={state.address || ""}
+                          value={address || ""}
                           variant="outlined"
                         />
                       </Grid>
@@ -198,7 +204,7 @@ export const Company = () => {
                           label="Address 2"
                           name="address2"
                           onChange={handleChange}
-                          value={state.address2 || ""}
+                          value={address2 || ""}
                           variant="outlined"
                         />
                       </Grid>
@@ -209,7 +215,7 @@ export const Company = () => {
                           name="city"
                           onChange={handleChange}
                           required
-                          value={state.city || ""}
+                          value={city || ""}
                           variant="outlined"
                         />
                       </Grid>
@@ -221,7 +227,7 @@ export const Company = () => {
                           onChange={handleChange}
                           select
                           SelectProps={{ native: true }}
-                          value={state.state || ""}
+                          value={state || ""}
                           variant="outlined"
                         >
                           <option key={null} value={null} aria-label=" " />
@@ -241,8 +247,8 @@ export const Company = () => {
                           label="Zip"
                           name="zip"
                           onChange={handleChange}
-                          type="number"
-                          value={state.zip || ""}
+                          type="text"
+                          value={zip || ""}
                           variant="outlined"
                         />
                       </Grid>
@@ -252,13 +258,21 @@ export const Company = () => {
                           label="Country"
                           name="country"
                           onChange={handleChange}
-                          required
-                          value={state.country || ""}
+                          select
+                          SelectProps={{ native: true }}
+                          value={country || ""}
                           variant="outlined"
-                        />
+                        >
+                          <option key={null} value={null} aria-label=" " />
+                          {countries.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.text}
+                            </option>
+                          ))}
+                        </TextField>
                       </Grid>
                     </Grid>
-                    {/* ) : null} */}
+                     ) : null} 
                   </CardContent>
                   <Divider />
                   <Box
@@ -271,7 +285,7 @@ export const Company = () => {
                     <Button
                       color="primary"
                       variant="contained"
-                      disabled={state.isSubmitting}
+                      disabled={isSubmitting}
                       // onClick={submitUpdates}
                     >
                       Save details
@@ -295,13 +309,13 @@ export const Company = () => {
                 />
                 <Divider />
                 <CardContent>
-                  {/* {state.initialDataLoaded ? ( */}
+                   {initialDataLoaded ? ( 
                   <Grid container spacing={3}>
                     <Grid item md={6} xs={12}>
                       <Typography color="textPrimary" gutterBottom variant="h6">
                         Plan
                       </Typography>
-                      {Object.keys(state.plan && state.plan).length !== 0
+                      {Object.keys(plan && plan).length !== 0
                         ? [
                             <Typography
                               key="base"
@@ -309,8 +323,8 @@ export const Company = () => {
                               gutterBottom
                               variant="h6"
                             >
-                              ${state.plan.base_fee / 100.0}
-                              base fee + ${state.plan.per_user / 100.0}
+                              ${plan.base_fee / 100.0}
+                              base fee + ${plan.per_user / 100.0}
                               /active user/month
                             </Typography>,
                             ...integrations.map((integration) => (
@@ -321,7 +335,7 @@ export const Company = () => {
                                 variant="h6"
                               >
                                 + $
-                                {state.plan[integration.toLowerCase()] / 100.0}/
+                                {plan[integration.toLowerCase()] / 100.0}/
                                 {integration}
                                 user/month
                               </Typography>
@@ -332,16 +346,16 @@ export const Company = () => {
                       <Typography color="textPrimary" gutterBottom variant="h6">
                         Payment Method
                       </Typography>
-                      {Object.keys(state.payment_info ? state.payment_info : {})
+                      {Object.keys(payment_info ? payment_info : {})
                         .length !== 0 ? (
                         <Chip
                           avatar={
                             <Avatar
                               alt="Payment method"
-                              src={state.payment_info.image_url}
+                              src={payment_info.image_url}
                             />
                           }
-                          label={`${state.payment_info.card_type}*${state.payment_info.last_4}`}
+                          label={`${payment_info.card_type}*${payment_info.last_4}`}
                           clickable
                           // onClick={openUpdatePaymentInfoModal}
                           sx={{ maxWidth: "100%" }}
@@ -359,7 +373,7 @@ export const Company = () => {
                       <Typography color="textPrimary" gutterBottom variant="h6">
                         Recent Invoices
                       </Typography>
-                      {state.payment_history.slice(0, 6).map((invoice) => (
+                      {payment_history.slice(0, 6).map((invoice) => (
                         <Typography
                           color="textPrimary"
                           gutterBottom
@@ -377,7 +391,7 @@ export const Company = () => {
                       ))}
                     </Grid>
                   </Grid>
-                  {/* ) : null} */}
+                   ) : null} 
                 </CardContent>
               </Card>
             </Grid>

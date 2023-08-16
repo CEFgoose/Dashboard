@@ -8,8 +8,6 @@ import {
   Typography,
   Modal,
   Divider,
-  Box,
-  TextField,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import React from "react";
@@ -308,21 +306,13 @@ export const ConfirmModalCommon = (props) => {
           }}
         >
           <Button
-            style={{
-              marginLeft: "1vw",
-              marginRight: "1vw",
-              textAlign: "center",
-            }}
+            style={{ marginLeft: "1vw", marginRight: "1vw", textAlign: "center" }}
             onClick={() => props.button_1_action()}
           >
             {props.button_1_text}
           </Button>
           <Button
-            style={{
-              marginLeft: "1vw",
-              marginRight: "1vw",
-              textAlign: "center",
-            }}
+            style={{ marginLeft: "1vw", marginRight: "1vw", textAlign: "center" }}
             onClick={() => props.button_2_action()}
           >
             {props.button_2_text}
@@ -340,56 +330,6 @@ export const ConfirmModalCommon = (props) => {
       aria-describedby="simple-modal-description"
     >
       {modal_body}
-    </Modal>
-  );
-};
-
-export const AddProjectModal = (props) => {
-  return (
-    <Modal open={props.addOpen} key="add">
-      <ModalWrapper>
-        <CloseButton close_action={props.handleAddOpen} />
-        <SectionTitle title_text={"Add a Project to monitor"} bold={true} />
-        <SectionSubtitle
-          bold={true}
-          subtitle_text={"Enter the details about this project."}
-        />
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              marginLeft: "1vw",
-              width: "100%",
-            }}
-          >
-            <SectionTitle title_text={"URL:"} bold={true} />
-            <input
-              type="text"
-              value={props.url}
-              onChange={(e) => props.handleSetUrl(e)}
-              style={{ height: "5vh", marginRight: "3vw", width: "95%" }}
-            />
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: "1vh",
-            marginTop: "1vh",
-            marginLeft: "1vw",
-            justifyContent: "center",
-          }}
-        >
-          <StyledButton
-            button_text="Add Project"
-            button_action={props.handleAddProject}
-          />
-        </div>
-      </ModalWrapper>
     </Modal>
   );
 };

@@ -24,21 +24,19 @@ export const DataProvider = ({ children }) => {
 
   const [fetching, setFetching] = useState(false);
   const history = useNavigate();
-  const [userSelected, setUserSelected] = useState(null);
+  const [userSelected, setUserSelected] = useState("");
 
-  const [firstName, setFirstName] = useState(null);
-  const [lastName, setLastName] = useState(null);
-  const [fullName, setFullName] = useState(null);
-  const [OSMname, setOSMname] = useState(null);
-  const [city, setCity] = useState(null);
-  const [country, setCountry] = useState(null);
-  const [email, setEmail] = useState(null);
-  const [payEmail, setPayEmail] = useState(null);
-
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [activeProjects, setActiveProjects] = useState([]);
-  const [inactiveProjects, setInactiveProjects] = useState(null);
+  const [first_name, setFirst_name] = useState("");
+  const [last_name, setLast_name] = useState("");
+  const [email, setEmail] = useState("");
+  const [invitationsAreSending, setInvitationsAreSending] = useState(false);
+  const [birthday, setBirthday] = useState("");
+  const [gender, setGender] = useState([]);
+  const [phone, setPhone] = useState("");
+  // editable by admin
+  const [role, setRole] = useState([]);
+  const [is_active, setIs_active] = useState([]);
+  const [integrations, setIntegrations] = useState([]);
 
   const handleSetSidebarState = () => {
     toggleSidebarOpen();
@@ -114,35 +112,38 @@ export const DataProvider = ({ children }) => {
   const handleUserDetailsStates = (state, e) => {
     switch (state) {
       case "first_name":
-        setFirstName(e.target.value);
+        setFirst_name(e.target.value);
         break;
       case "last_name":
-        setLastName(e.target.value);
+        setLast_name(e.target.value);
         break;
-      case "osm_name":
-        setOSMname(e.target.value);
+      case "birthday":
+        setBirthday(e.target.value);
         break;
-      case "city":
-        setCity(e.target.value);
+      case "gender":
+        setGender(e.target.value);
         break;
-      case "country":
-        setCountry(e.target.value);
+      case "phone":
+        setPhone(e.target.value);
         break;
       case "email":
         setEmail(e.target.value);
         break;
-      case "pay_email":
-        setPayEmail(e.target.value);
+      case "is_active":
+        setIs_active(e.target.value);
+        break;
+      case "integrations":
+        setIntegrations(e.target.value);
         break;
       case "response":
-        setFirstName(e.first_name);
-        setLastName(e.last_name);
-        setFullName(e.full_name);
-        setOSMname(e.osm_username);
-        setCity(e.city);
-        setCountry(e.country);
+        setFirst_name(e.first_name);
+        setLast_name(e.last_name);
         setEmail(e.email);
-        setPayEmail(e.payment_email);
+        setGender(e.gender);
+        setBirthday(e.birthday);
+        setIs_active(e.is_active);
+        setIntegrations(e.integrations);
+
         break;
       default:
         break;
@@ -150,82 +151,35 @@ export const DataProvider = ({ children }) => {
   };
 
   const fetchUserDetails = () => {
-    let fetchUserDetailsURL = "user/fetch_user_details";
+    let fetchUserDetailsURL = "users/fetch_user_details";
     fetcher(fetchUserDetailsURL).then((response) => {
       if (response.status === 200) {
         handleUserDetailsStates("response", response);
+        console.log(response)
       } else if (response.status === 304) {
         history("/login");
       } else {
         alert(response.message);
       }
     });
+  
+
   };
 
   const updateUserDetails = () => {
     let outpack = {
-      first_name: firstName,
-      last_name: lastName,
-      osm_username: OSMname,
-      city: city,
-      country: country,
+      first_name: first_name,
+      last_name: last_name,
       email: email,
-      payment_email: payEmail,
+      birthday: birthday,
+      gender: gender,
+      role: role,
+      phone: phone,
+      is_active: is_active,
     };
-    let updateUserDetailsURL = "user/update_user_details";
+    let updateUserDetailsURL = "users/update_user_details";
     poster(outpack, updateUserDetailsURL).then((response) => {
       if (response.status === 200) {
-        return;
-      } else if (response.status === 304) {
-        history("/login");
-      } else {
-        alert(response.message);
-      }
-    });
-  };
-
-  const getOverpassData = () => {
-    let get_overpass_data = "/overpass_data_celery";
-    let outpack = {
-      start_date: "08-01-2023",
-      end_date: "08-07-2023",
-      osm_id: [13352657],
-    };
-    poster(outpack, get_overpass_data).then((response) => {
-      if (response.status === 200) {
-      } else if (response.status === 304) {
-        history.push("/");
-      } else {
-        alert(response.message);
-      }
-    });
-  };
-
-  const getTaskManagerData = () => {
-    let userTaskStatsURL = "task/get_task_manager_data";
-    let outpack = {
-      project_id: 10218,
-    };
-    poster(outpack, userTaskStatsURL).then((response) => {
-      if (response.status === 200) {
-      } else if (response.status === 304) {
-        history.push("/");
-      } else {
-        alert(response.message);
-      }
-    });
-  };
-
-  //PROJECT ORIENTED API CALLS AND HANDLERS
-
-  const addProject = (url) => {
-    let addProjectURL = "project/add_project";
-    let outpack = {
-      url: url,
-    };
-    poster(outpack, addProjectURL).then((response) => {
-      if (response.status === 200) {
-        alert("New Project Added");
         return;
       } else if (response.status === 304) {
         history("/login");
@@ -250,13 +204,24 @@ export const DataProvider = ({ children }) => {
     fetchUserDetails,
     updateUserDetails,
     handleUserDetailsStates,
-
-    getOverpassData,
-    setStartDate,
-    setEndDate,
-
-    getTaskManagerData,
-    addProject,
+    invitationsAreSending,
+    setInvitationsAreSending,
+    gender,
+    setGender,
+    first_name,
+    setFirst_name,
+    last_name,
+    setLast_name,
+    birthday,
+    setBirthday,
+    email,
+    setEmail,
+    is_active,
+    setIs_active,
+    phone,
+    setPhone,
+    role,
+    setRole,
   };
 
   return value ? (

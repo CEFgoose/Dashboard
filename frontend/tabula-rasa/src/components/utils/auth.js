@@ -1,21 +1,13 @@
-import axios from "network";
 import Cookie from "js-cookie";
+import { SSO_URL } from "components/constants";
 
-export function logout() {
-  axios
-    .post("/api/auth/logout")
-    .then(() => {
-      localStorage.removeItem("user");
-      window.location.replace("/");
-    })
-    .catch(() => {
-      // some day this could be prettier? but not often used.
-      // eslint-disable-next-line no-alert
-      alert(
-        "There was an error logging out. You should try refreshing the page and logging out again."
-      );
-    });
-}
+export const logout = () => {
+  fetch(SSO_URL.concat("auth/logout"), {
+    method: "POST",
+  }).then(() => {
+    setUser(null);
+  });
+};
 
 export function getUser() {
   return JSON.parse(localStorage.getItem("user"));
