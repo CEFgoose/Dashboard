@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: tabula-rasa-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tabula-rasa-frontend
+  template:
+    metadata:
+      labels:
+        app: tabula-rasa-frontend
+    spec:
+      containers:
+        - name: tabula-rasa-frontend
+          image: registry.gitlab.com/gokaart/tabula-rasa/tabula-rasa-frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+      imagePullSecrets:
+        - name: regcred

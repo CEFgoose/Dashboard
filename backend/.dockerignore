@@ -1,0 +1,7 @@
+**/.DS_Store
+**/.git
+**/venv
+.dockerignore
+tabula-rasa-d3mo
+test_db
+venv

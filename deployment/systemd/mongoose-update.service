@@ -1,0 +1,6 @@
+[Unit]
+Description=tabula-rasa update service
+OnFailure=status_email_user@%n.service
+
+[Service]
+ExecStart=%h/bin/update-tabula-rasa.sh

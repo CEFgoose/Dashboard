@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: tabula-rasa
+  labels:
+    app: tabula-rasa-backend
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: tabula-rasa-backend
+  template:
+    metadata:
+      labels:
+        app: tabula-rasa-backend
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      containers:
+      - name: tabula-rasa-backend
+        image: "{{ .Values.image.repository }}/tabula-rasa-backend:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 8000
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      - {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  namespace: tabula-rasa
+  labels:
+    app: tabula-rasa-frontend
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: tabula-rasa-frontend
+  template:
+    metadata:
+      labels:
+        app: tabula-rasa-frontend
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      containers:
+      - name: tabula-rasa-frontend
+        image: "{{ .Values.image.repository }}/tabula-rasa-frontend:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 80
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        - {{- toYaml . | nindent 8 }}
+      {{- end }}

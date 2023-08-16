@@ -1,0 +1,9 @@
+[Unit]
+Description=Run tabula-rasa backend
+OnFailure=status_email_user@%n.service
+[Service]
+ExecStart=%h/bin/flask-tabula-rasa.sh
+Restart=always
+RestartSec=30
+[Install]
+WantedBy=default.target

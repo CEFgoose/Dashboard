@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  selector:
+    app: tabula-rasa-frontend
+  ports:
+    - protocol: TCP
+      port: 80
