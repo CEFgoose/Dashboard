@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Redirect, Route } from "react-router-dom";
 import { AuthContext } from "common/AuthContext";
 
 export const PrivateRoute = ({ children, role, admin, ...rest }) => {
@@ -7,17 +7,20 @@ export const PrivateRoute = ({ children, role, admin, ...rest }) => {
   const loggedIn = () => user;
 
   return (
-    <Routes>
-      <Route
-        {...rest}
-        element={
-          loggedIn() && (admin ? user.role === "admin" : true) ? (
-            children
-          ) : (
-            <Navigate to={loggedIn() ? "/dashboard" : "/login"} replace />
-          )
-        }
-      />
-    </Routes>
+    <Route
+      {...rest}
+      render={({ location }) =>
+        loggedIn() && (admin ? user.role === "admin" : true) ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: loggedIn() ? "/dashboard" : "/login",
+              state: { from: location },
+            }}
+          />
+        )
+      }
+    />
   );
 };

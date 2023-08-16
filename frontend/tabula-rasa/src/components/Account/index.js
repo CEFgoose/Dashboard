@@ -62,18 +62,24 @@ export const AccountPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`/api/users/${id}`).then((response) => {
-      setState({
-        ...state,
-        ...response.data.result,
-        birthday: response.data.result.birthday
-          ? format(
-              parse(response.data.result.birthday, "yyyy-MM-dd", new Date()),
-              "MM/dd/yyyy"
-            )
-          : null,
+
+    if(id){
+
+      axios.get(`/api/users/${id}`).then((response) => {
+        setState({
+          ...state,
+          ...response.data.result,
+          birthday: response.data.result.birthday
+            ? format(
+                parse(response.data.result.birthday, "yyyy-MM-dd", new Date()),
+                "MM/dd/yyyy"
+              )
+            : null,
+        });
       });
-    });
+
+    }
+
   }, [id]);
 
   const handleChange = (event) => {

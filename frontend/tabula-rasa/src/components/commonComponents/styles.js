@@ -9,19 +9,14 @@ export const Container = styled.div`
 `;
 
 export const Button = styled.div`
-  position: relative;
-  box-shadow: 0px 2px 2px lightgray;
   color: white;
   text-transform: capitalize;
   background-color: #253e45;
   width: 8rem;
-  min-height: 2.8em;
   margin-right: 1vw;
-  height: 2.8em;
+  height: 4vh;
   border-radius: 6px;
   padding: 1px 1px;
-  line-height: 2.5em; 
-  align-items: center;
   &:hover {
     cursor: pointer;
     background-color: #91a5ac;

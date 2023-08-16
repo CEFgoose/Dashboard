@@ -1,8 +1,9 @@
 ///// IMPORTS /////
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
+import { DataContext } from "common/DataContext";
 import { poster } from "calls";
 import useToggle from "../../hooks/useToggle.js";
-import { Navigate, useNavigate } from "react-router-dom";
+// import { Redirect } from "react-router-dom";
 import {
   ConfirmButton,
   SectionSubtitle,
@@ -25,7 +26,7 @@ export const RegisterUser = () => {
   const [responseMessage, setResponseMessage] = useState(null);
   const [responseCode, setResponseCode] = useState(null);
   const [redirect, toggleRedirect] = useToggle(false);
-
+  const { history} = useContext(DataContext);
   async function RegisterUserSSO() {
     let url = "register_user";
     let outpack = {
@@ -120,7 +121,8 @@ export const RegisterUser = () => {
           }
         />
       </RegisterPage>
-      {!redirect ? <></> : <Navigate push to="/login" />}
+      history('/login')
+
     </>
   );
 };

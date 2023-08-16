@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 from .IntegerIntFlag import IntegerIntFlag
 from .common import db
-from .core import User, Project
+from .core import (
+    User,
+)
 
 __all__ = [
     "db",

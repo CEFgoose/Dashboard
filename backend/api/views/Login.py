@@ -17,6 +17,10 @@ class LoginAPI(MethodView):
     def post(self, path: str):
         if path == "login":
             return self.do_login()
+        
+        if path == "users":
+            return self.fetch_users()
+
         return jsonify({"message": "Only auth/login is permitted!"}), 405
 
     def do_login(self):
@@ -69,4 +73,36 @@ class LoginAPI(MethodView):
         return_obj["role"] = g.user.role
         return_obj["id"] = g.user.id
         return_obj["status"] = 200
+        return return_obj
+
+    def fetch_users(self):
+        # Initialize an empty dictionary for returning the response
+        return_obj = {}
+        # Check if the user is not found in the context
+        if not g:
+            return_obj["message"] = "User not found"
+            return_obj["status"] = 304
+            return return_obj
+        # Get all the users from the database that belong to the same organization as the current user
+        users_in_org = User.query.filter_by(org_id=g.user.org_id).all()
+        # Initialize an empty list to store information about the users
+        org_users = []
+        # Loop over each user and extract relevant information
+        for user in users_in_org:
+            # Capitalize first and last name of the user
+            first_name = user.first_name.title()
+            last_name = user.last_name.title()
+            full_name = first_name + " " + last_name
+            # Append the user information to the org_users list
+            org_users.append(
+                {
+                    "name": full_name,
+                    "role": user.role,
+                    "joined": user.create_time,
+                }
+            )
+        # Add the list of users to the return_obj dictionary
+        return_obj["users"] = org_users
+        return_obj["status"] = 200
+        # Return the final response
         return return_obj

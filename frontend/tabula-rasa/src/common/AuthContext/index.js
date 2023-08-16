@@ -27,13 +27,13 @@ export const AuthProvider = ({ children }) => {
       .then((response) => {
         if (!response.ok) {
           alert("Refreshing access token failed, please log in again");
-          history("/login");
+          history.push("/login");
         }
         return response;
       })
       .catch(() => {
         alert("Refreshing access token failed, please log in again");
-        history("/login");
+        history.push("/login");
       })
       .then(() => {});
   };

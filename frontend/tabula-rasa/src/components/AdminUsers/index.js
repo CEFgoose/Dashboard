@@ -3,6 +3,7 @@ import { InteractionContext } from "common/InteractionContext";
 import { DataContext } from "common/DataContext";
 import { AuthContext } from "common/AuthContext";
 import Sidebar from "../sidebar/sidebar";
+import { fetcher } from "calls";
 import "./styles.css";
 import { useNavigate } from 'react-router-dom';
 import {
@@ -163,6 +164,8 @@ export const Users = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [inviteModalOpen, setinviteModalOpen] = useState(false);
 
+  const [users, setUsers] = useState([]);
+
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -200,15 +203,36 @@ export const Users = () => {
 
   const fetchUsers = (usersToFetch) => {
     const args = usersToFetch === 'inactive' ? '?show-inactive=true' : '';
-    axios.get(`/api/users${args}`).then((response) => {
-      setState({
-        ...state,
-        rows: response.data.result,
-        filteredRows: response.data.result,
-        usersToFetch
-      });
+    let removeUsersURL = "users"
+    fetcher(removeUsersURL).then((response) => {
+      if (response.status === 200) {
+        setUsers(response.users);
+        return;
+      } else if (response.status === 304) {
+        
+      } else {
+        alert(response.message);
+      }
     });
   };
+    // axios.get(`/api/users/fetch_user_role${args}`).then((response) => {
+    //   setState({
+    //     ...state,
+    //     rows: response.data.result,
+    //     filteredRows: response.data.result,
+    //     usersToFetch
+    //   });
+    // })
+    // .catch((error) => {
+    //   if (error.response) {
+    //     console.error(error.response.data, error.response.status, error.response.headers);
+    //   } else if (error.request) {
+    //     console.error(error.request);
+    //   } else {
+    //     console.error("Error", error.message);
+    //   }
+    // });
+  // };
 
   const handleIntegrationChange = (event) => {
     let newIntegrations = [...state.integrationsForNewUsers];
@@ -252,11 +276,11 @@ export const Users = () => {
     };
 
     axios
-      .post('/api/auth/invite-user', payload)
+      .post('/api/user/invite_user', payload)
       .then(() => {
         // growl success
       })
-      .catch(() => {
+      .catch((error) => {
         // growl fail
       })
       .finally(() => {
@@ -495,10 +519,15 @@ export const Users = () => {
                     rowCount={state.filteredRows.length}
                   />
                   <TableBody>
-                    {stableSort(
-                      state.filteredRows,
-                      getComparator(order, orderBy)
-                    )
+                    {
+                    
+                    // stableSort(
+                    //   state.filteredRows,
+                    //   getComparator(order, orderBy)
+                    // )
+
+                    users && users
+
                       .slice(
                         page * rowsPerPage,
                         page * rowsPerPage + rowsPerPage
@@ -524,7 +553,7 @@ export const Users = () => {
                             <TableCell>{row.email}</TableCell>
                             <TableCell>{row.role}</TableCell>
                             <TableCell>
-                              {row.is_active.toString()}
+                              {/* {row.is_active.toString()} */}
                             </TableCell>
                           </TableRow>
                         );

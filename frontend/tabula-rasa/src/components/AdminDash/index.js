@@ -1,3 +1,4 @@
+
 import React, { useContext, useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DataContext } from "../../common/DataContext";
@@ -5,23 +6,13 @@ import { AuthContext } from "../../common/AuthContext";
 import Sidebar from "../sidebar/sidebar";
 import { Navigate } from "react-router-dom";
 import "./styles.css";
-import {
-  CancelConfirmButtons,
-  AddProjectModal,
-  AddUserModal,
-} from "components/commonComponents/commonComponents";
-import useToggle from "../../hooks/useToggle.js";
 
 export const AdminDash = () => {
   // DATA CONTEXT STATES AND FUNCTIONS //
-  const { getOverpassData, getTaskManagerData, addProject } =
-    useContext(DataContext);
+
   const { sidebarOpen, handleSetSidebarState } = useContext(DataContext);
   const { refresh, user } = useContext(AuthContext);
-  const [redirect, setRedirect] = useState(false);
-
-  const [url, setUrl] = useState(null);
-  const [addProjectOpen, toggleAddProjectOpen] = useToggle(false);
+  // const [redirect, setRedirect] = useState(false);
 
   // SETS STATE OF CONTROL SIDEBAR OPEN / COLLAPSED //
   const handleViewSidebar = () => {
@@ -32,99 +23,47 @@ export const AdminDash = () => {
       refresh();
     }
     if (user === null) {
-      setRedirect(true);
+      // setRedirect(true);
     }
     if (user !== null && user.role !== "admin") {
-      setRedirect(true);
+      // setRedirect(true);
     }
     // eslint-disable-next-line
   }, []);
 
-  const handleGetOverpassData = () => {
-    getOverpassData();
-  };
-
-  const handleGetTaskManagerData = () => {
-    getTaskManagerData();
-  };
-
-  const handleAddProjectOpen = () => {
-    toggleAddProjectOpen(!addProjectOpen);
-  };
-
-  const handleSetUrl = (e) => {
-    setUrl(e.target.value);
-  };
-
-  const handleAddProject = (e) => {
-    addProject(url);
-    handleAddOpen();
-  };
 
   return (
     <div style={{ width: "100%", float: "left" }}>
       <Sidebar isOpen={sidebarOpen} toggleSidebar={handleViewSidebar} />
       <Tabs
-        style={{
-          textAlign: "center",
-        }}
+        style={
+          sidebarOpen
+            ? { marginLeft: "16%", width: "83vw", textAlign: "center" }
+            : { marginLeft: "1rem", width: "98vw", textAlign: "center" }
+        }
       >
-        <div>
-          <h1 style={{ paddingTop: "5vh" }}>
-            <strong>Dashboard</strong>
-          </h1>
-        </div>
         <TabList>
           <Tab>Tab 1</Tab>
           <Tab>Tab 2</Tab>
           <Tab>Tab 3</Tab>
         </TabList>
         <TabPanel>
-          <div style={{ marginBottom: "3vh" }}>
-            <CancelConfirmButtons
-              confirm_text={"Add"}
-              cancel_text={"Cancel"}
-              confirm_action={handleGetOverpassData}
-              // cancel_action={getOverpassData}
-            />
+          <div>
+            <strong><h1>TABULA RASA</h1></strong>
+            <strong><h4>A boilerplate React & Flask app by Kaart Engineering</h4></strong>
           </div>
-          <div style={{ marginBottom: "3vh" }}>
-            <CancelConfirmButtons
-              confirm_text={"Add"}
-              cancel_text={"Cancel"}
-              confirm_action={handleGetTaskManagerData}
-              // cancel_action={getOverpassData}
-            />
-          </div>
-          <div style={{ marginBottom: "3vh" }}>
-            <CancelConfirmButtons
-              confirm_text={"Add"}
-              cancel_text={"Cancel"}
-              confirm_action={handleAddProjectOpen}
-              // cancel_action={getOverpassData}
-            />
-          </div>
-          <AddProjectModal
-            addOpen={addOpen}
-            handleAddOpen={handleAddOpen}
-            url={url}
-            handleSetUrl={handleSetUrl}
-            handleAddProject={handleAddProject}
-          />
-          <CancelConfirmButtons
-            confirm_text={"Add"}
-            cancel_text={"Cancel"}
-            confirm_action={handleAddProjectOpen}
-            // cancel_action={getOverpassData}
-          />
+        </TabPanel>
+          
+        <TabPanel>
+
         </TabPanel>
 
-        <TabPanel></TabPanel>
+        <TabPanel>
 
-        <TabPanel></TabPanel>
+        </TabPanel>
+
       </Tabs>
-
-      {!redirect ? <></> : <Navigate push to="/login" />}
+      {/* {!redirect ? <></> : <Redirect push to="/login" />} */}
     </div>
   );
 };

@@ -64,7 +64,7 @@ export const KaartLogoOpen = styled.div`
 `;
 
 export const KaartLogoClosed = styled.div`
-  background-image: url(${kaartLogo});
+  background-image: url(${whiteKaartLogo});
   background-repeat: no-repeat;
   background-position: 50%;
   max-width: 100%;
@@ -163,16 +163,16 @@ export const RoleBarWrapper = styled.div`
   border-radius: 6px;
 `;
 
-export const RoleHeader = styled.h1`
-  text-align: center;
-  font-size: 1.1rem;
+export const RoleHeader = styled.h6`
+  /* text-align: center; */
+  /* font-size: 1.1rem; */
   padding-top: 5px;
   color: #253e45;
   font-weight: 700;
 `;
 
 export const RoleSubHeader = styled.h6`
-  text-align: center;
+  /* text-align: center; */
   color: #253e45;
   opacity: 0.7;
 `;

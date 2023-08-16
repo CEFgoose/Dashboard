@@ -9,6 +9,7 @@ from flask_jwt_extended import (
 )
 from ..static_variables import SSO_BASE_URL
 
+
 class UserAPI(MethodView):
     @jwt_required()
     def post(self, path: str):
@@ -50,22 +51,27 @@ class UserAPI(MethodView):
     def invite_user(self):
         # Initialize an empty dictionary to store the response
         return_obj = {}
-        # Get the target email address from the request
-        target_email = (
-            request.json["email"] if "email" in request.json else None
+        # Get the target payload from the request
+        target_payload = (
+            request.json if request.json else None
         )
-        # Check if the email address is not provided or is an empty string
-        if not target_email or target_email == "":
+        # Check if the email address is not provided
+        if not target_payload or target_payload["emails"] == []:
             return_obj["message"] = "email address required"
             return_obj["status"] = 400
             return return_obj
         # Construct the URL for sending the registration email
         url = SSO_BASE_URL + "auth/send_reg_email"
         # Send the request to the SSO API
-        response = requests.post(url, json={"email": target_email})
+        response = target_payload["emails"]
+        for email in range(len(target_payload["emails"])):
+            response[email] = requests.post(url, json={"email": target_payload["emails"][email]})
         # Update the return object with the response from the SSO API
         return_obj["message"] = "email sent"
-        return_obj["sso_response"] = response.status_code
+        sso_response = response
+        for email in range(len(response)):
+            sso_response[email] = response[email].status_code
+        return_obj["sso_response"] = sso_response
         return_obj["status"] = 200
         # Return the response
         return return_obj

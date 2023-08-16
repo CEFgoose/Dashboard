@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
+import { DataContext } from "common/DataContext";
 import {
   RegisterAsUserButton,
   RegisterCompanyButton,
   RegisterWrapper,
 } from "./styles";
-import { Navigate } from "react-router-dom";
+
 //COMPONENT DECLARATION & EXPORT - SSO CONTROLS ON VIEWER LOGIN PAGE- SENDS INVITE INFO TO KAART SSO FOR NE USERS
 export const SSOControl = (props) => {
   const [redirect, setRedirect] = useState(false);
+  const { history} = useContext(DataContext);
   return (
     <>
       <RegisterWrapper>
@@ -61,7 +63,8 @@ export const SSOControl = (props) => {
       >
         Forgot password?
       </button>
-      {!redirect ? <></> : <Navigate push to="/registerUser" />}
+      {/* history("/registerUser") */}
+
     </>
   );
 };

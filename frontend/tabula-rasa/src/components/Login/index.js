@@ -7,7 +7,7 @@ import { SSOControl } from "components/SSOControl";
 import Cookie from "js-cookie";
 import React, { useContext, useEffect, useState } from "react";
 import kaartLogo from "../../images/20-KAART-Color.svg";
-import { useNavigate } from "react-router-dom";
+
 import {
   LoginButton,
   LoginForm,
@@ -21,13 +21,12 @@ var checkrole;
 
 //COMPONENT SETUP & DECLARATION
 export const Login = () => {
-  const history= useNavigate();
   //COMPONENT STATES
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   //STATES FROM DATA CONTEXT
-  const { fetching, setFetching, showAlert } = useContext(DataContext);
+  const { fetching, setFetching, showAlert, history } = useContext(DataContext);
 
   //STATES FROM AUTH CONTEXT
   const { setUser } = useContext(AuthContext);
@@ -74,9 +73,6 @@ export const Login = () => {
       //   if (err) alert("danger", "Failed to log in", err["message"]);
       // });
   };
-
-  
-
 
   //COMPONENT RENDER
   return (

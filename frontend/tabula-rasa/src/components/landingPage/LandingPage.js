@@ -1,5 +1,5 @@
-import React ,{useState} from "react";
-import { Navigate } from "react-router-dom";
+import React ,{useState, useContext} from "react";
+import { DataContext } from "common/DataContext";
 import useToggle from "hooks/useToggle";
 import { 
   styled, 
@@ -12,9 +12,8 @@ import {
 } from "@mui/material";
 
 
-
-
 export const LandingPage = (props) =>{
+  const { history } = useContext(DataContext);
   const [redirect, setRedirect] = useToggle(false);
   const handleSetRedirect=()=>{
     setRedirect()
@@ -46,14 +45,14 @@ export const LandingPage = (props) =>{
               <Button
                 size="large"
                 variant="contained"
-                onClick={()=>handleSetRedirect()}
+                onClick={(e)=>history('/login')}
               >
                 Login
               </Button>
             </div>
 
       </div>
-      {!redirect ? <></> : <Navigate push to="/login" />}
+        
     </>
   );
 }
