@@ -32,7 +32,7 @@ class TaskAPI(MethodView):
 
         payload = {}
         headers = {
-            "Authorization": "Bearer TVRBek5ERTBNalEuWVFzUXJRLm5HX0ZuaURJb2tlRjNzV1g4cXA2TExBOUVMRQ==",  # noqa: E501
+            "Authorization": "",  # noqa: E501
             "Accept-Language": "en-US",
         }
         TM4url = (
