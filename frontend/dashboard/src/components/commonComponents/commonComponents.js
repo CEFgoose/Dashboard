@@ -193,7 +193,14 @@ export const TitleDiv = (props) => {
 
 export const StyledButton = (props) => {
   return (
-    <Button onClick={props.button_action}>
+    <Button
+      onClick={props.button_action}
+      style={{
+        boxShadow: "1px 1px 6px 2px gray",
+        textAlign: "center",
+        lineHeight: "2.0em",
+      }}
+    >
       <ButtonLabel>{props.button_text}</ButtonLabel>
     </Button>
   );
@@ -300,13 +307,13 @@ export const ConfirmModalCommon = (props) => {
           }}
         >
           <Button
-            style={{ marginLeft: "1vw", marginRight: "1vw" }}
+            style={{ marginLeft: "1vw", marginRight: "1vw", textAlign: "center" }}
             onClick={() => props.button_1_action()}
           >
             {props.button_1_text}
           </Button>
           <Button
-            style={{ marginLeft: "1vw", marginRight: "1vw" }}
+            style={{ marginLeft: "1vw", marginRight: "1vw", textAlign: "center" }}
             onClick={() => props.button_2_action()}
           >
             {props.button_2_text}

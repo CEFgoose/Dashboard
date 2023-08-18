@@ -36,34 +36,29 @@ export const AdminDash = () => {
     <div style={{ width: "100%", float: "left" }}>
       <Sidebar isOpen={sidebarOpen} toggleSidebar={handleViewSidebar} />
       <Tabs
-        style={
-          sidebarOpen
-            ? { marginLeft: "16%", width: "83vw", textAlign: "center" }
-            : { marginLeft: "1rem", width: "98vw", textAlign: "center" }
+        style={{
+            textAlign: "center"
+          }  
         }
       >
+        <div>
+          <h1 style={{ paddingTop: "5vh" }}>
+            <strong>Dashboard</strong>
+          </h1>
+        </div>
         <TabList>
           <Tab>Tab 1</Tab>
           <Tab>Tab 2</Tab>
           <Tab>Tab 3</Tab>
         </TabList>
-        <TabPanel>
-          <div>
-            <strong><h1>TABULA RASA</h1></strong>
-            <strong><h4>A boilerplate React & Flask app by Kaart Engineering</h4></strong>
-          </div>
-        </TabPanel>
+        <TabPanel></TabPanel>
           
-        <TabPanel>
+        <TabPanel></TabPanel>
 
-        </TabPanel>
-
-        <TabPanel>
-
-        </TabPanel>
+        <TabPanel></TabPanel>
 
       </Tabs>
-      {/* {!redirect ? <></> : <Redirect push to="/login" />} */}
+      {/* {!redirect ? <></> : <Navigate push to="/login" />} */}
     </div>
   );
 };

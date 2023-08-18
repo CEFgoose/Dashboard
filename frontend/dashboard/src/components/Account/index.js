@@ -31,6 +31,8 @@ import Sidebar from "../sidebar/sidebar";
 import { DataContext } from "common/DataContext";
 import { AuthContext } from "common/AuthContext";
 
+import { fetcher } from "calls";
+
 export const AccountPage = () => {
   const [state, setState] = useState({
     // underbarred to match server schema.
@@ -63,23 +65,37 @@ export const AccountPage = () => {
 
   useEffect(() => {
 
-    if(id){
+    // if(id){
 
-      axios.get(`/api/users/${id}`).then((response) => {
+      // axios.get(`/api/users/${id}`).then((response) => {
+      //   setState({
+      //     ...state,
+      //     ...response.data.result,
+      //     birthday: response.data.result.birthday
+      //       ? format(
+      //           parse(response.data.result.birthday, "yyyy-MM-dd", new Date()),
+      //           "MM/dd/yyyy"
+      //         )
+      //       : null,
+      //   });
+      // });
+
+    // }
+
+    let fetchUserDetailsURL = "user/fetch_user_details"
+    fetcher(fetchUserDetailsURL).then((response) => {
+      if (response.status === 200) {
         setState({
           ...state,
-          ...response.data.result,
-          birthday: response.data.result.birthday
-            ? format(
-                parse(response.data.result.birthday, "yyyy-MM-dd", new Date()),
-                "MM/dd/yyyy"
-              )
-            : null,
+          ...response,
         });
-      });
-
-    }
-
+      } else if (response.status === 304) {
+        
+      } else {
+        alert(response.message);
+      }
+    });
+    
   }, [id]);
 
   const handleChange = (event) => {
@@ -278,7 +294,11 @@ export const AccountPage = () => {
                           type="text"
                           value={state.email}
                           variant="outlined"
-                          disabled
+
+                          // disabled
+
+                          onChange={handleChange}
+
                         />
                       </Grid>
                       {/* {user.role === 'admin' ? ( */}
@@ -291,14 +311,18 @@ export const AccountPage = () => {
                             onChange={handleChange}
                             select
                             SelectProps={{ native: true }}
-                            value={state.role}
+
+                            value={state.role ? state.role : "user"}
+
                             variant="outlined"
                           >
-                            {/* {roles.map((option) => (
+
+                            {roles.map((option) => (
                                 <option key={option} value={option}>
                                   {option}
                                 </option>
-                              ))} */}
+                              ))}
+
                           </TextField>
                         </Grid>
                         <Grid item md={6} xs={12}>

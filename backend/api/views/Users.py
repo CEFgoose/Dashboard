@@ -21,6 +21,10 @@ class UserAPI(MethodView):
             return self.unassign_user()
         elif path == "invite_user":
             return self.invite_user()
+        
+        elif path == "fetch_user_details":
+            return self.fetch_user_details()
+
         return {
             "message": "Only /project/{fetch_users,fetch_user_projects} is permitted with GET",  # noqa: E501
         }, 405
@@ -42,6 +46,32 @@ class UserAPI(MethodView):
             name = f"{firstname} {lastname}"
             # update the response dictionary with the extracted information
             response["role"] = role
+            response["name"] = name
+            response["status"] = 200
+            return response
+
+    def fetch_user_details(self):
+        # initialize an empty dictionary to store the response
+        response = {}
+        # check if the user information is available in the global context
+        if not g:
+            response["message"] = "User not found"
+            response["status"] = 304
+            return response
+        else:
+            # extract the user information
+            role = g.user.role
+            firstname = g.user.first_name.capitalize()
+            lastname = g.user.last_name.capitalize()
+            name = f"{firstname} {lastname}"
+            # update the response dictionary with the extracted information
+            response["first_name"] = firstname
+            response["last_name"] = lastname
+            response["gender"] = g.user.gender
+            response["phone"] = g.user.phone
+            response["email"] = g.user.email
+            response["role"] = role
+            response["is_active"] = g.user.is_active
             response["name"] = name
             response["status"] = 200
             return response

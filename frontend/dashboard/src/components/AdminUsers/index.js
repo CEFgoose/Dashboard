@@ -202,8 +202,9 @@ export const Users = () => {
   };
 
   const fetchUsers = (usersToFetch) => {
-    const args = usersToFetch === 'inactive' ? '?show-inactive=true' : '';
-    let removeUsersURL = "users"
+    const args = usersToFetch === 'inactive' ? 'inactive_' : '';
+    let removeUsersURL = `${args}users`
+    setState({...state, usersToFetch: usersToFetch})
     fetcher(removeUsersURL).then((response) => {
       if (response.status === 200) {
         setUsers(response.users);
@@ -553,7 +554,7 @@ export const Users = () => {
                             <TableCell>{row.email}</TableCell>
                             <TableCell>{row.role}</TableCell>
                             <TableCell>
-                              {/* {row.is_active.toString()} */}
+                              {row.is_active.toString()}
                             </TableCell>
                           </TableRow>
                         );

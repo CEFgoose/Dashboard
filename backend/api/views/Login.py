@@ -20,6 +20,8 @@ class LoginAPI(MethodView):
         
         if path == "users":
             return self.fetch_users()
+        if path == "inactive_users":
+            return self.fetch_inactive_users()
 
         return jsonify({"message": "Only auth/login is permitted!"}), 405
 
@@ -83,8 +85,8 @@ class LoginAPI(MethodView):
             return_obj["message"] = "User not found"
             return_obj["status"] = 304
             return return_obj
-        # Get all the users from the database that belong to the same organization as the current user
-        users_in_org = User.query.filter_by(org_id=g.user.org_id).all()
+        # Get all the active users from the database that belong to the same organization as the current user
+        users_in_org = User.query.filter_by(org_id=g.user.org_id, is_active = True).all()
         # Initialize an empty list to store information about the users
         org_users = []
         # Loop over each user and extract relevant information
@@ -96,6 +98,46 @@ class LoginAPI(MethodView):
             # Append the user information to the org_users list
             org_users.append(
                 {
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "email": user.email,
+                    "is_active": user.is_active,
+                    "name": full_name,
+                    "role": user.role,
+                    "joined": user.create_time,
+                }
+            )
+        # Add the list of users to the return_obj dictionary
+        return_obj["users"] = org_users
+        return_obj["status"] = 200
+        # Return the final response
+        return return_obj
+    
+    def fetch_inactive_users(self):
+        # Initialize an empty dictionary for returning the response
+        return_obj = {}
+        # Check if the user is not found in the context
+        if not g:
+            return_obj["message"] = "User not found"
+            return_obj["status"] = 304
+            return return_obj
+        # Get all the inactive users from the database that belong to the same organization as the current user
+        users_in_org = User.query.filter_by(org_id=g.user.org_id, is_active = False).all()
+        # Initialize an empty list to store information about the users
+        org_users = []
+        # Loop over each user and extract relevant information
+        for user in users_in_org:
+            # Capitalize first and last name of the user
+            first_name = user.first_name.title()
+            last_name = user.last_name.title()
+            full_name = first_name + " " + last_name
+            # Append the user information to the org_users list
+            org_users.append(
+                {
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "email": user.email,
+                    "is_active": user.is_active,
                     "name": full_name,
                     "role": user.role,
                     "joined": user.create_time,

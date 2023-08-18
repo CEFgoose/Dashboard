@@ -37,20 +37,29 @@ export const UserDashboard = () => {
         style={
           sidebarOpen
             ? { marginLeft: "16%", width: "83vw", textAlign: "center" }
-            : { marginLeft: "10%", width: "88vw", textAlign: "center" }
+            : { marginLeft: "1rem", width: "98vw", textAlign: "center" }
         }
       >
-        <TabList className="tabheader">
-          {/* <Tab selectedClassName="activetab">Tab 1</Tab> */}
-
+          <div>
+            <strong><h1 style={{paddingTop: "5vh"}}>Dashboard</h1></strong>
+          </div>
+        <TabList>
           <Tab>Tab 1</Tab>
           <Tab>Tab 2</Tab>
-
+          <Tab>Tab 3</Tab>
         </TabList>
+        <TabPanel>
+          
+        </TabPanel>
+          
+        <TabPanel>
+
+        </TabPanel>
 
         <TabPanel>
-        {/* <Tab selectedClassName="activetab">Tab 2</Tab> */}
+
         </TabPanel>
+
       </Tabs>
       history('/login')
     </div>
