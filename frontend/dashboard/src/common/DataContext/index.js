@@ -5,6 +5,7 @@ import { AuthContext } from "common/AuthContext";
 import { API_URL } from "components/constants";
 import { fetcher, poster } from "../../calls";
 import useToggle from "../../hooks/useToggle";
+import { format, parse } from "date-fns";
 import React, {
   createContext,
   useContext,
@@ -109,8 +110,9 @@ export const DataProvider = ({ children }) => {
     });
   };
 
-  const handleUserDetailsStates = (state, e) => {
-    switch (state) {
+  const handleUserDetailsStates = (switcher, e) => {
+    // setPhone(response.phone);
+    switch (switcher) {
       case "first_name":
         setFirst_name(e.target.value);
         break;
@@ -137,13 +139,19 @@ export const DataProvider = ({ children }) => {
         break;
       case "response":
         setFirst_name(e.first_name);
-        setLast_name(e.last_name);
-        setEmail(e.email);
+        setLast_name(e.last_name);        
+        const parsedBirthday = new Date(e.birthday);
+        // Convert to local time
+        const localParsedBirthday = new Date(
+          parsedBirthday.getTime() + parsedBirthday.getTimezoneOffset() * 60000
+        );
+        setBirthday(localParsedBirthday);
         setGender(e.gender);
-        setBirthday(e.birthday);
+        setPhone(e.phone);
+        setEmail(e.email);
         setIs_active(e.is_active);
         setIntegrations(e.integrations);
-
+        setRole(e.role);       
         break;
       default:
         break;
@@ -151,19 +159,18 @@ export const DataProvider = ({ children }) => {
   };
 
   const fetchUserDetails = () => {
-    let fetchUserDetailsURL = "users/fetch_user_details";
+    let fetchUserDetailsURL = "user/fetch_user_details";
     fetcher(fetchUserDetailsURL).then((response) => {
+      console.log("Response from fetchUserDetails:", response);
       if (response.status === 200) {
         handleUserDetailsStates("response", response);
-        console.log(response)
+        // console.log(response);
       } else if (response.status === 304) {
         history("/login");
       } else {
         alert(response.message);
       }
     });
-  
-
   };
 
   const updateUserDetails = () => {
@@ -177,9 +184,10 @@ export const DataProvider = ({ children }) => {
       phone: phone,
       is_active: is_active,
     };
-    let updateUserDetailsURL = "users/update_user_details";
+    let updateUserDetailsURL = "user/update_user_details";
     poster(outpack, updateUserDetailsURL).then((response) => {
       if (response.status === 200) {
+        alert("Account Updated Successfully");
         return;
       } else if (response.status === 304) {
         history("/login");

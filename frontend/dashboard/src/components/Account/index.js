@@ -19,9 +19,8 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
 import { isValid, format, parse } from "date-fns";
-// import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-// import { KeyboardDatePicker } from '@material-ui/pickers';
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import IsoDatetimeStringToLocalString from "../utils/IsoDatetimeStringToLocalString";
 import { getUser, setUser } from "../utils/auth";
 import { integrations, genders, roles } from "../utils/constants";
@@ -65,7 +64,6 @@ export const AccountPage = () => {
     integrations,
     setIntegrations,
   } = useContext(DataContext);
-
   const { refresh, user } = useContext(AuthContext);
 
   useEffect(() => {
@@ -75,12 +73,12 @@ export const AccountPage = () => {
     if (user === null) {
       history("/login");
     }
-    if (user !== null && user.role !== "admin") {
-      history("/login");
-    }
+    console.log("integrations:", integrations);
+
     fetchUserDetails();
+
     // eslint-disable-next-line
-  }, []);
+  }, [integrations]);
 
   const handleFirstNameChange = (event) => {
     setFirst_name(event.target.value);
@@ -112,7 +110,6 @@ export const AccountPage = () => {
 
   const handleDateChange = (date) => {
     if (isValid(date)) {
-      // const stringDate = format(date, "MM/dd/yyyy");
       setBirthday(date);
     }
   };
@@ -171,6 +168,7 @@ export const AccountPage = () => {
 
   const [startDate, setStartDate] = useState(new Date());
 
+  const open = Boolean(menuAnchorEl);
   return (
     <>
       <div className="account">
@@ -233,7 +231,7 @@ export const AccountPage = () => {
                             )}
                             disableToolbar
                             variant="inline"
-                            format="MM/dd/yyyy"
+                            dateFormat="MM/dd/yyyy"
                             margin="normal"
                             id="date-picker-inline"
                             label="Birthday"
@@ -271,7 +269,9 @@ export const AccountPage = () => {
                           label="Phone Number"
                           name="phone"
                           onChange={handlePhoneChange}
-                          type="text"
+                          // type="tel"
+                          placeholder="123-456-7890"
+                          // pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
                           value={phone}
                           variant="outlined"
                         />
@@ -300,6 +300,7 @@ export const AccountPage = () => {
                               value={role || []}
                               variant="outlined"
                             >
+                              <option key={null} value={null} aria-label=" " />
                               {roles?.map((option) => (
                                 <option key={option} value={option}>
                                   {option}
@@ -402,7 +403,7 @@ export const AccountPage = () => {
                     {user.role === "admin" ? (
                       <>
                         <Button
-                          aria-controls="customized-menu"
+                          aria-controls="actions-menu"
                           aria-haspopup="true"
                           onClick={handleMenuOpen}
                           sx={{
@@ -415,7 +416,7 @@ export const AccountPage = () => {
                           id="actions-menu"
                           anchorEl={menuAnchorEl}
                           keepMounted
-                          open={Boolean(menuAnchorEl)}
+                          open={open}
                           onClose={handleMenuClose}
                         >
                           <MenuItem

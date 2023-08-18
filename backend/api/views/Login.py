@@ -37,7 +37,7 @@ class LoginAPI(MethodView):
             print(at_cookie)
             # Use a session to access the user information from the SSO
             with requests.Session() as s:
-                org_id = jwt_user["company_id"]
+                company_id = jwt_user["company_id"]
                 # Get the user information from the SSO
                 url = SSO_BASE_URL
                 resp = s.get(
@@ -51,7 +51,7 @@ class LoginAPI(MethodView):
                     user = User.create(
                         id=jwt_user["id"],
                         role=jwt_user["role"],
-                        org_id=org_id,
+                        company_id=company_id,
                         first_name=user_info["first_name"],
                         last_name=user_info["last_name"],
                         email=user_info["email"],

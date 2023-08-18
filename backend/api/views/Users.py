@@ -13,6 +13,7 @@ from ..static_variables import SSO_BASE_URL
 class UserAPI(MethodView):
     @jwt_required()
     def post(self, path: str):
+        print(path)
         if path == "fetch_user_role":
             return self.fetch_user_role()
         elif path == "assign_user":
@@ -22,7 +23,10 @@ class UserAPI(MethodView):
         elif path == "invite_user":
             return self.invite_user()
         elif path == "fetch_user_details":
-            return self.fetch_user_details()       
+            return self.fetch_user_details()
+        elif path == "update_user_details":
+            return self.update_user_details()       
+       
         return {
             "message": "Only /project/{fetch_users,fetch_user_projects} is permitted with GET",  # noqa: E501
         }, 405
@@ -144,7 +148,6 @@ class UserAPI(MethodView):
             return response
         else:
             # extract the role, first name, and last name from the user information # noqa: E501
-            id = g.user.id
             first_name = g.user.first_name.capitalize()
             last_name = g.user.last_name.capitalize()
             role = g.user.role
@@ -153,17 +156,19 @@ class UserAPI(MethodView):
             birthday = g.user.birthday
             phone = g.user.phone
             is_active = g.user.is_active
+            integrations = g.user.integrations            
             full_name = f"{first_name} {last_name}"
             # update the response dictionary with the extracted information
             response["role"] = role
             response["first_name"] = first_name
             response["last_name"] = last_name
             response["email"] = email
-            response["id"] = id
             response["gender"] = gender
             response["birthday"] = birthday
             response["phone"] = phone
             response["is_active"] = is_active
+            print(integrations)
+            response["integrations"] = integrations
             response["status"] = 200
             
             return response
@@ -187,6 +192,7 @@ class UserAPI(MethodView):
             "gender",
             "phone",
             "is_active"
+            "integrations"
         ]
         for field in fields:
             value = request.json.get(field)

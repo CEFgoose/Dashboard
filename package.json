@@ -1,7 +1,16 @@
 {
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/lab": "^5.0.0-alpha.140",
+    "@mui/material": "^5.14.5",
+    "@mui/styled-engine-sc": "^5.12.0",
+    "@mui/x-date-pickers": "^6.11.2",
     "axios": "^1.4.0",
+    "dayjs": "^1.11.9",
+    "react-date-picker": "^10.5.0",
     "react-select": "^5.7.4",
-    "react-select-country-list": "^2.2.3"
+    "react-select-country-list": "^2.2.3",
+    "styled-components": "^5.3.11"
   }
 }

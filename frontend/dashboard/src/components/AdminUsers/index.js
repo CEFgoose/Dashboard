@@ -223,7 +223,7 @@ export const Users = () => {
       );
     }
     // remove duplicates just in case something fails
-
+    console.log(integrations)
     setIntegrationsForNewUsers(newIntegrations);
   };
 
@@ -392,7 +392,7 @@ export const Users = () => {
           <Button
             onClick={inviteNewUsers}
             color="primary"
-            disabled={invitationsAreSending || emailsToInvite.length == 0}
+            disabled={invitationsAreSending || emailsToInvite.length === 0}
           >
             Send Invitations
           </Button>
